@@ -20,12 +20,11 @@ public class UiRestaurant {
         }
     }
 
-    public void start() {
-        Scanner scanner = new Scanner(System.in);
-        boolean running = true;
 
+    public void start() {
 
         while (running) {
+
             String description = """
                     Restaurant Management System
                     1. Register Customer
@@ -39,6 +38,7 @@ public class UiRestaurant {
             System.out.println(description);
             int choice = scanner.nextInt();
             scanner.nextLine();
+
             switch (choice) {
                 case 1 -> {
                     System.out.print("Enter customer name: ");
@@ -51,6 +51,7 @@ public class UiRestaurant {
                 case 2 -> {
                     System.out.print("Enter customer ID: ");
                     String customerId = scanner.nextLine();
+
                     if (customerId.equals("C0")) {
                         System.out.print("Enter admin password: ");
                         String passwordAdmin = scanner.nextLine();
@@ -268,6 +269,7 @@ public class UiRestaurant {
                     Menu menu = service.findMenu(menuCode);
                     System.out.println("Found Menu: " + menu);
                 }
+
                 case 5 -> {
                     running = false;
                     System.out.println("Exiting...");
@@ -278,5 +280,3 @@ public class UiRestaurant {
         scanner.close();
     }
 }
-
-
