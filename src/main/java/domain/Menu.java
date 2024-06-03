@@ -33,7 +33,12 @@ public class Menu {
         this.price = price;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "Menu{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                '}';
+    }
 }

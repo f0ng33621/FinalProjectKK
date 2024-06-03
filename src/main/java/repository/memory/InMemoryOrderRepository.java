@@ -39,4 +39,8 @@ public class InMemoryOrderRepository implements OrderRepository {
                 .stream()
                 .filter(a -> a.getCustomer().getId().equals(customerId)).toList();
     }
+
+    public Collection<Order> listAllCustomerOrder(){
+        return repo.values();
+    }
 }
