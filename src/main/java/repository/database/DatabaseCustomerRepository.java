@@ -75,7 +75,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public Customer createCustomer(String customerName, String phoneNumber) {
+    public Customer CreateCustomer(String customerName, String phoneNumber) {
         if(customerName == null || phoneNumber == null) return null;
         try{Class.forName("com.mysql.cj.jdbc.Driver");}
         catch (ClassNotFoundException e){
@@ -97,6 +97,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         }
         return null;
     }
+
 
     @Override
     public Customer findCustomer(String customerId) {
