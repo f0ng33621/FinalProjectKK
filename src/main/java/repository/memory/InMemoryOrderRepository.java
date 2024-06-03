@@ -32,6 +32,10 @@ public class InMemoryOrderRepository implements OrderRepository {
     public Order findByCode(String orderCode) {
         return repo.get(orderCode);
     }
+    public double getTotalAmountOfAllOrders(){
+        return repo.values().stream().mapToDouble(Order::getTotalAmount).sum();
+    }
+
 
     @Override
     public Collection<Order> listAllOrderOwnedBy(String customerId) {
@@ -39,7 +43,6 @@ public class InMemoryOrderRepository implements OrderRepository {
                 .stream()
                 .filter(a -> a.getCustomer().getId().equals(customerId)).toList();
     }
-
     public Collection<Order> listAllCustomerOrder(){
         return repo.values();
     }

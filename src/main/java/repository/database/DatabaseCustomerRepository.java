@@ -7,9 +7,9 @@ import java.sql.*;
 import java.util.*;
 
 public class DatabaseCustomerRepository implements CustomerRepository {
-    private static String serverName = "jdbc:mysql://localhost:3306/java103";
-    private static String username = "root";
-    private static String password = "Fong_33621";
+    private static final String serverName = "jdbc:mysql://localhost:3306/java103";
+    private static final String username = "root";
+    private static final String password = "Fong_33621";
     private static long nextCustomerId = 0;
 
     public static void main(String[] args) throws SQLException {
@@ -62,8 +62,8 @@ public class DatabaseCustomerRepository implements CustomerRepository {
                 // Table does not exist
                 String createTableSQL = "CREATE TABLE customers (" +
                         "id VARCHAR(20) PRIMARY KEY, " +
-                        "name VARCHAR(100), " +
-                        "phoneNumber VARCHAR(15))";
+                        "name VARCHAR(255) NOT NULL, " +
+                        "phonenumber VARCHAR(15) NOT NULL)";
                 try (Statement statement = connection.createStatement()) {
                     statement.execute(createTableSQL);
                     System.out.println("Table 'customers' created.");
@@ -75,14 +75,14 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public Customer CreateCustomer(String customerName, String phoneNumber) {
+    public Customer createCustomer(String customerName, String phoneNumber) {
         if(customerName == null || phoneNumber == null) return null;
         try{Class.forName("com.mysql.cj.jdbc.Driver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
         String customerId = "C" + ++nextCustomerId;
-        String insertSQL = "INSERT INTO customers (id, name, phoneNumber) VALUE (?, ?, ?)";
+        String insertSQL = "INSERT INTO customers (id, name, phonenumber) VALUE (?, ?, ?)";
         try(Connection connection = DriverManager.getConnection(serverName,username,password);
         PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
             preparedStatement.setString(1,customerId);
@@ -116,7 +116,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
                 if (resultSet.next()) {
                     String id = resultSet.getString("id");
                     String name = resultSet.getString("name");
-                    String phoneNumber = resultSet.getString("phoneNumber");
+                    String phoneNumber = resultSet.getString("phonenumber");
                     Customer fromDB = new Customer(id,name,phoneNumber);
                     return fromDB;
                 } else {
@@ -168,7 +168,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
             while (resultSet.next()) {
                 String id = resultSet.getString("id");
                 String name = resultSet.getString("name");
-                String phoneNumber = resultSet.getString("phoneNumber");
+                String phoneNumber = resultSet.getString("phonenumber");
                 Customer customer = new Customer(id, name, phoneNumber);
                 customers.add(customer);
             }

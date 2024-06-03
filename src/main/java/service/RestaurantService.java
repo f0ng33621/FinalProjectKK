@@ -115,7 +115,9 @@ public class RestaurantService {
         Customer admin = new Customer("C0","ADMIN","000");
         return admin;
     }
-    public Collection<Order> listAllOrder() {return order.listAllCustomerOrder();}
+    public Collection<Order> listAllOrder() {
+      return order.listAllCustomerOrder();
+    }
 
 
 }

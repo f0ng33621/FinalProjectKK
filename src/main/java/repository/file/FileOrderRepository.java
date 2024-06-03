@@ -126,4 +126,21 @@ public class FileOrderRepository implements OrderRepository {
         }
         return orders;
     }
+
+    @Override
+    public Collection<Order> listAllCustomerOrder() {
+        List<Order> orders = new ArrayList<>();
+        try (FileInputStream fileIn = new FileInputStream(filename);
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            Order ord;
+            while ((ord = (Order) in.readObject()) != null) {
+                    orders.add(ord);
+            }
+        } catch (EOFException e) {
+            // This exception is expected when there are no more objects to read
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return orders;
+    }
 }
