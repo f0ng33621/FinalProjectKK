@@ -111,6 +111,9 @@ public class RestaurantService {
         if (customerId == null || findCustomer(customerId) == null) return null;
         return order.listAllOrderOwnedBy(customerId);
     }
+    public Collection<Order> listAllOrder() {
+        return order.listAllCustomerOrder();
+    }
 
 
 
