@@ -19,7 +19,7 @@ public class RestaurantService {
         this.menu = menu;
         this.order = order;
     }
-//แก้ return null นะ
+    //แก้ return null นะ
     public Customer registerCustomer(String customerName, String phoneNumber){
         if (customerName.isBlank()) return null;
         return customer.createCustomer(customerName,phoneNumber);
@@ -68,7 +68,7 @@ public class RestaurantService {
         if (menuCode.isBlank()) return null;
         return menu.findMenu(menuCode);
     }
-    public Collection<Menu> allAccounts() {
+    public Collection<Menu> allMenu() {
         return menu.allMenu();
     }
     public boolean removeMenu(String menuCode){
@@ -111,10 +111,13 @@ public class RestaurantService {
         if (customerId == null || findCustomer(customerId) == null) return null;
         return order.listAllOrderOwnedBy(customerId);
     }
-    public Collection<Order> listAllOrder() {
-        return order.listAllCustomerOrder();
+    public Customer adminAcc(){
+        Customer admin = new Customer("C0","ADMIN","000");
+        return admin;
     }
-
+    public Collection<Order> listAllOrder() {
+      return order.listAllCustomerOrder();
+    }
 
 
 }
