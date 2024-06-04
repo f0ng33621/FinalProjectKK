@@ -1,32 +1,31 @@
-package repository.database;
+package repository.database.databaseonline;
+
 import domain.Customer;
 import service.CustomerRepository;
 
-import javax.swing.*;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class DatabaseCustomerRepository implements CustomerRepository {
-    private static final String serverName = "jdbc:mysql://localhost:3306/java103";
-    private static final String username = "root";
-    private static final String password = "Fong_33621";
+    private static final String hostName = "javadatabase.database.windows.net";
+    private static final String dbName = "javaproject";
+    private static final String user = "Fong";
+    private static final String password = "Darkkiller_204";
+    private static final String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, password);
+
     private static long nextCustomerId = 0;
 
 
-    public static void main(String[] args) throws SQLException { //Test Database
-//        String hostName = "javadatabase.database.windows.net";
-//        String dbName = "javaproject";
-//        String user = "Fong";
-//        String Password = "Darkkiller_204";
-//        String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, Password);
+    public static void main(String[] args) throws SQLException {
         Connection connection = null;
         try {
             // Load the MySQL JDBC driver
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Establish the connection
-//            connection = DriverManager.getConnection(url); //For azure sql server
-            connection = DriverManager.getConnection(serverName, username, password);
+            connection = DriverManager.getConnection(url); //Test azure database
             System.out.println("Connected to the database!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,7 +45,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
-        try (Connection connection = DriverManager.getConnection(serverName, username, password)) {
+        try (Connection connection = DriverManager.getConnection(url)) {
             DatabaseMetaData dbm = connection.getMetaData();
             ResultSet tables = dbm.getTables(null, null, "customers", null);
             if (!tables.next()) {
@@ -74,7 +73,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         }
         String customerId = "C" + ++nextCustomerId;
         String insertSQL = "INSERT INTO customers (id, name, phonenumber) VALUE (?, ?, ?)";
-        try(Connection connection = DriverManager.getConnection(serverName,username,password);
+        try(Connection connection = DriverManager.getConnection(url);
         PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
             preparedStatement.setString(1,customerId);
             preparedStatement.setString(2,customerName);
@@ -99,7 +98,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         }
         String selectSQL = "SELECT * FROM customers WHERE id = ?";
 
-        try (Connection connection = DriverManager.getConnection(serverName,username,password);
+        try (Connection connection = DriverManager.getConnection(url);
                 PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             preparedStatement.setString(1, customerId);
 
@@ -132,7 +131,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         String Name = customer.getName();
         String phoneNumber = customer.getPhoneNumber();
         String updateSQL = "UPDATE customers SET name = ?, phone_number = ? WHERE id = ?";
-        try(Connection connection = DriverManager.getConnection(serverName,username,password);
+        try(Connection connection = DriverManager.getConnection(url);
         PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)){
             preparedStatement.setString(1,Name);
             preparedStatement.setString(2,phoneNumber);
@@ -152,7 +151,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         List<Customer> customers = new ArrayList<>();
         String selectSQL = "SELECT * FROM customers";
 
-        try (Connection connection = DriverManager.getConnection(serverName, username, password);
+        try (Connection connection = DriverManager.getConnection(url);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(selectSQL)) {
 

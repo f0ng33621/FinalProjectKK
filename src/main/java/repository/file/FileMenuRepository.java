@@ -41,7 +41,7 @@ public class FileMenuRepository implements MenuRepository {
     }
     @Override
     public Menu createMenu(String menuName, double price) {
-        if(menuName == null || price == null) return null;
+        if(menuName == null || price <0.0) return null;
         String MenuId = "M" + ++nextMenuId;
         Menu menu = new Menu(MenuId,menuName,price);
         if (repo.putIfAbsent(MenuId, menu) == null) {
