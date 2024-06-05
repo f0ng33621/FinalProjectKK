@@ -63,28 +63,46 @@ public class UiRestaurant {
                     String name = scanner.nextLine();
                     System.out.print("Enter phone number: ");
                     String phone = scanner.nextLine();
-                    if (console == null) {
-                        // Handle no console case
-                        System.out.print("Console not available. Enter password: ");
-                        String regPassword = scanner.nextLine();
-                    } else {
-                        char[] regPasswordArray = console.readPassword("Enter password: ");
-                        String regPassword = new String(regPasswordArray);
-                    }
                     Customer customer = service.registerCustomer(name, phone);
                     System.out.println("Registered Customer: " + customer);
                 }
                 case 2 -> {
                     System.out.print("Enter customer ID: ");
                     String customerId = scanner.nextLine();
-
                     if (customerId.equals("C0")) {
-                        System.out.print("Enter admin password: ");
-                        String passwordAdmin = scanner.nextLine();
-                        if (!passwordAdmin.equals("admin")) {
-                            System.out.println("Incorrect password.");
+                        boolean isAuthenticated = false;
+                        int attempts = 3;
+                        String correctPassword = "admin";
+                        boolean authenticationAttempted = false; // Add this flag
+
+                        while (attempts > 0 && !isAuthenticated) {
+                            if (console == null) {
+                                // Handle no console case
+                                System.out.println("There is no console. Please run on Jar");
+                                authenticationAttempted = true; // Mark that authentication was attempted
+                                break;
+                            } else {
+                                char[] regPasswordArray = console.readPassword("Enter password: ");
+                                String regPassword = new String(regPasswordArray);
+                                if (!regPassword.equals(correctPassword)) {
+                                    System.out.println("Incorrect password. Please try again.");
+                                    attempts--;
+                                } else {
+                                    isAuthenticated = true;
+                                }
+                            }
+                        }
+
+                        if (!isAuthenticated && authenticationAttempted) {
+                            // Exit if authentication was attempted but failed due to no console
                             break;
                         }
+
+                        if (!isAuthenticated) {
+                            System.out.println("Too many failed attempts. Exiting.");
+                            break;
+                        }
+
                         boolean adminRunning = true;
                         String adminDescription = """
                                 1. Find Customer
