@@ -8,20 +8,23 @@ import service.RestaurantService;
 import java.util.Scanner;
 import domain.Customer;
 import domain.Order;
+import java.io.Console;
 import java.util.Collection;
+
 public class UiRestaurant {
+
     private final RestaurantService service;
 
     public UiRestaurant(boolean useDatabase) {
-        if(!useDatabase){
-            service = new RestaurantService(new InMemoryCustomerRepository(),new InMemoryMenuRepository(),new InMemoryOrderRepository());
+        if (!useDatabase) {
+            service = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
         } else {
-            service = new RestaurantService(new InMemoryCustomerRepository(),new InMemoryMenuRepository(),new InMemoryOrderRepository());
+            service = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
         }
     }
 
-
     public void start() {
+        Console console = System.console();
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
         while (running) {
@@ -37,15 +40,37 @@ public class UiRestaurant {
                     """;
 
             System.out.println(description);
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
+            //check if input is int
+            int choice = 0;
+            boolean validInput = false;
+            while (!validInput) {
+                System.out.println("Please enter a number between 1 and 5:");
+                if (scanner.hasNextInt()) {
+                    choice = scanner.nextInt();
+                    scanner.nextLine();
+                    if (choice >= 1 && choice <= 5) {
+                        validInput = true;
+                    } else {
+                        System.out.print("Invalid choice. Please enter a number between 1 and 5:");
+                    }
+                } else {
+                    scanner.nextLine();
+                }
+            }
             switch (choice) {
                 case 1 -> {
                     System.out.print("Enter customer name: ");
                     String name = scanner.nextLine();
                     System.out.print("Enter phone number: ");
                     String phone = scanner.nextLine();
+                    if (console == null) {
+                        // Handle no console case
+                        System.out.print("Console not available. Enter password: ");
+                        String regPassword = scanner.nextLine();
+                    } else {
+                        char[] regPasswordArray = console.readPassword("Enter password: ");
+                        String regPassword = new String(regPasswordArray);
+                    }
                     Customer customer = service.registerCustomer(name, phone);
                     System.out.println("Registered Customer: " + customer);
                 }
@@ -135,7 +160,8 @@ public class UiRestaurant {
                                     adminRunning = false;
                                     System.out.println("Logged out.");
                                 }
-                                default -> System.out.println("Invalid choice. Please try again.");
+                                default ->
+                                    System.out.println("Invalid choice. Please try again.");
                             }
                         }
                     } else {
@@ -229,8 +255,10 @@ public class UiRestaurant {
                                                 System.out.println("Order cancelled: " + order);
                                                 orderRunning = false;
                                             }
-                                            case 0 -> orderRunning = false;
-                                            default -> System.out.println("Invalid choice. Please try again.");
+                                            case 0 ->
+                                                orderRunning = false;
+                                            default ->
+                                                System.out.println("Invalid choice. Please try again.");
                                         }
                                     }
                                 }
@@ -252,7 +280,8 @@ public class UiRestaurant {
                                     loginRunning = false;
                                     System.out.println("Logged out.");
                                 }
-                                default -> System.out.println("Invalid choice. Please try again.");
+                                default ->
+                                    System.out.println("Invalid choice. Please try again.");
                             }
                         }
                     }
@@ -275,7 +304,8 @@ public class UiRestaurant {
                     running = false;
                     System.out.println("Exiting...");
                 }
-                default -> System.out.println("Invalid choice. Please try again.");
+                default ->
+                    System.out.println("Invalid choice. Please try again.");
             }
         }
         scanner.close();
