@@ -13,7 +13,7 @@ public class UiRestaurant {
     private final RestaurantService service;
 
     public UiRestaurant(boolean useDatabase) {
-        if (!useDatabase){
+        if(!useDatabase){
             service = new RestaurantService(new InMemoryCustomerRepository(),new InMemoryMenuRepository(),new InMemoryOrderRepository());
         } else {
             service = new RestaurantService(new InMemoryCustomerRepository(),new InMemoryMenuRepository(),new InMemoryOrderRepository());
@@ -22,7 +22,8 @@ public class UiRestaurant {
 
 
     public void start() {
-
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
         while (running) {
 
             String description = """
@@ -32,7 +33,7 @@ public class UiRestaurant {
                     3. List All Menus
                     4. Find Menu
                     5. Exit
-                    Choose an option: 
+                    Choose an option:
                     """;
 
             System.out.println(description);
@@ -66,7 +67,7 @@ public class UiRestaurant {
                                 3. Rename Menu
                                 4. Reprice Menu
                                 5. Remove Menu
-                                6. List All Orders 
+                                6. List All Orders
                                 7. List All Customers
                                 0. Logout
                                 """;
@@ -185,7 +186,7 @@ public class UiRestaurant {
                                     String userOrderCode = order.getOrderCode();
                                     boolean orderRunning = true;
                                     String orderDescription = """
-                                            1. Add menu to your order 
+                                            1. Add menu to your order
                                             2. Remove menu from your order
                                             3. List all menu you have ordered
                                             4. Submit
