@@ -9,7 +9,6 @@ import java.util.Scanner;
 import domain.Customer;
 import domain.Order;
 import java.io.Console;
-import static java.lang.System.console;
 import java.util.Collection;
 
 public class UiRestaurant {
@@ -25,11 +24,11 @@ public class UiRestaurant {
     }
 
     public void start() {
-        Scanner scanner = new Scanner(System.in);
         Console console = System.console();
+        Scanner scanner = new Scanner(System.in);
         boolean running = true;
-
         while (running) {
+
             String description = """
                     Restaurant Management System
                     1. Register Customer
@@ -37,23 +36,27 @@ public class UiRestaurant {
                     3. List All Menus
                     4. Find Menu
                     5. Exit
-                    Choose an option: 
+                    Choose an option:
                     """;
 
             System.out.println(description);
-
             //check if input is int
-            int choice;
-            if (!scanner.hasNextInt()) {
-                scanner.nextLine();
-                System.out.println("Invalid choice. Please enter a number between 1 and 5:");
-                choice = scanner.nextInt();
-                scanner.nextLine();
-            } else {
-                choice = scanner.nextInt();
-                scanner.nextLine();
+            int choice = 0;
+            boolean validInput = false;
+            while (!validInput) {
+                System.out.println("Please enter a number between 1 and 5:");
+                if (scanner.hasNextInt()) {
+                    choice = scanner.nextInt();
+                    scanner.nextLine();
+                    if (choice >= 1 && choice <= 5) {
+                        validInput = true;
+                    } else {
+                        System.out.print("Invalid choice. Please enter a number between 1 and 5:");
+                    }
+                } else {
+                    scanner.nextLine();
+                }
             }
-
             switch (choice) {
                 case 1 -> {
                     System.out.print("Enter customer name: ");
@@ -62,7 +65,7 @@ public class UiRestaurant {
                     String phone = scanner.nextLine();
                     if (console == null) {
                         // Handle no console case
-                        System.out.println("Console not available. Enter password: ");
+                        System.out.print("Console not available. Enter password: ");
                         String regPassword = scanner.nextLine();
                     } else {
                         char[] regPasswordArray = console.readPassword("Enter password: ");
@@ -74,6 +77,7 @@ public class UiRestaurant {
                 case 2 -> {
                     System.out.print("Enter customer ID: ");
                     String customerId = scanner.nextLine();
+
                     if (customerId.equals("C0")) {
                         System.out.print("Enter admin password: ");
                         String passwordAdmin = scanner.nextLine();
@@ -88,14 +92,14 @@ public class UiRestaurant {
                                 3. Rename Menu
                                 4. Reprice Menu
                                 5. Remove Menu
-                                6. List All Orders //yang mai sret
+                                6. List All Orders
                                 7. List All Customers
                                 0. Logout
                                 """;
                         while (adminRunning) {
                             System.out.println(adminDescription);
                             int adminChoice = scanner.nextInt();
-                            scanner.nextLine(); // Consume newline
+                            scanner.nextLine();
                             switch (adminChoice) {
                                 case 1 -> {
                                     System.out.print("Enter customer ID: ");
@@ -138,7 +142,7 @@ public class UiRestaurant {
                                     }
                                 }
                                 case 6 -> {
-                                    Collection<Order> orders = service.listAllOrderOwnedBy("C0");
+                                    Collection<Order> orders = service.listAllOrder();
                                     System.out.println("All Orders:");
                                     for (Order order : orders) {
                                         System.out.println(order);
@@ -151,6 +155,7 @@ public class UiRestaurant {
                                         System.out.println(customer);
                                     }
                                 }
+
                                 case 0 -> {
                                     adminRunning = false;
                                     System.out.println("Logged out.");
@@ -194,7 +199,7 @@ public class UiRestaurant {
                                     System.out.println("Updated Customer: " + updatedCustomer);
                                 }
                                 case 3 -> {
-                                    Collection<Menu> menus = service.allAccounts();
+                                    Collection<Menu> menus = service.allMenu();
                                     System.out.println("All menus:");
                                     for (Menu menu : menus) {
                                         System.out.println(menu);
@@ -207,7 +212,7 @@ public class UiRestaurant {
                                     String userOrderCode = order.getOrderCode();
                                     boolean orderRunning = true;
                                     String orderDescription = """
-                                            1. Add menu to your order 
+                                            1. Add menu to your order
                                             2. Remove menu from your order
                                             3. List all menu you have ordered
                                             4. Submit
@@ -264,6 +269,13 @@ public class UiRestaurant {
                                         System.out.println(order);
                                     }
                                 }
+                                case 6 -> {
+                                    Collection<Order> orders = service.listAllOrder();
+                                    System.out.println("All Orders:");
+                                    for (Order order : orders) {
+                                        System.out.println(order);
+                                    }
+                                }
                                 case 0 -> {
                                     loginRunning = false;
                                     System.out.println("Logged out.");
@@ -275,7 +287,7 @@ public class UiRestaurant {
                     }
                 }
                 case 3 -> {
-                    Collection<Menu> menus = service.allAccounts();
+                    Collection<Menu> menus = service.allMenu();
                     System.out.println("All menus:");
                     for (Menu menu : menus) {
                         System.out.println(menu);
@@ -287,6 +299,7 @@ public class UiRestaurant {
                     Menu menu = service.findMenu(menuCode);
                     System.out.println("Found Menu: " + menu);
                 }
+
                 case 5 -> {
                     running = false;
                     System.out.println("Exiting...");
