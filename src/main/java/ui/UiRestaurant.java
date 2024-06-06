@@ -1,6 +1,10 @@
 package ui;
 
 import domain.Menu;
+import repository.database.*;
+import repository.file.FileCustomerRepository;
+import repository.file.FileMenuRepository;
+import repository.file.FileOrderRepository;
 import repository.memory.InMemoryCustomerRepository;
 import repository.memory.InMemoryMenuRepository;
 import repository.memory.InMemoryOrderRepository;
@@ -15,12 +19,49 @@ public class UiRestaurant {
 
     private final RestaurantService service;
 
-    public UiRestaurant(boolean useDatabase) {
-        if (!useDatabase) {
-            service = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
-        } else {
-            service = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
+    public UiRestaurant() {
+        Scanner chooseKeep = new Scanner(System.in);
+        boolean validChoice = false;
+        RestaurantService tempService = null;
+
+        while (!validChoice) {
+            System.out.println("""
+                    Your Select
+                    1 : InMemory
+                    2 : File
+                    3 : Database
+                    4 : DatabaseOnline
+                    """);
+            int choice = chooseKeep.nextInt();
+
+            switch (choice) {
+                case 1:
+                    tempService = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
+                    validChoice = true;
+                    break;
+                case 2:
+                    tempService = new RestaurantService(new FileCustomerRepository(), new FileMenuRepository(), new FileOrderRepository());
+                    validChoice = true;
+                    break;
+                case 3:
+                    tempService = new RestaurantService(new DatabaseCustomerRepository(), new DatabaseMenuRepository(), new DatabaseOrderRepository());
+                    validChoice = true;
+                    break;
+                case 4:
+                    tempService = new RestaurantService(new repository.database.databaseonline.DatabaseCustomerRepository(), new repository.database.databaseonline.DatabaseMenuRepository(), new repository.database.databaseonline.DatabaseOrderRepository());
+                    validChoice = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please choose again.");
+                    break;
+            }
         }
+
+        if (tempService == null) {
+            throw new RuntimeException("Invalid choice. Service not initialized.");
+        }
+
+        this.service = tempService;
     }
 
     public void start() {
@@ -235,7 +276,7 @@ public class UiRestaurant {
                                             3. List all menu you have ordered
                                             4. Submit
                                             5. Cancel
-                                            0. Exit Order Menu
+                                          
                                             """;
                                     while (orderRunning) {
                                         System.out.println(orderDescription);
@@ -273,8 +314,6 @@ public class UiRestaurant {
                                                 System.out.println("Order cancelled: " + order);
                                                 orderRunning = false;
                                             }
-                                            case 0 ->
-                                                orderRunning = false;
                                             default ->
                                                 System.out.println("Invalid choice. Please try again.");
                                         }

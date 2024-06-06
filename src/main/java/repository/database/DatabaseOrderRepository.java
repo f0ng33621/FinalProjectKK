@@ -169,4 +169,38 @@ public class DatabaseOrderRepository implements OrderRepository {
         }
         return orders;
     }
+
+    @Override
+    public boolean removeOrder(String orderCode) {
+        if(orderCode == null) return false;
+        boolean isRemoved = false;
+
+        // Prepare the SQL statement
+        String deleteSQL = "DELETE FROM orders WHERE ordercode = ?";
+
+        try {
+            // Load the JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try (Connection connection = DriverManager.getConnection(serverName, username, password);
+             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+
+            // Set the order code in the prepared statement
+            preparedStatement.setString(1, orderCode);
+
+            // Execute the delete statement
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            // If one or more rows were deleted, the order was removed
+            isRemoved = rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isRemoved;
+    }
 }

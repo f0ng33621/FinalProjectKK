@@ -35,6 +35,14 @@ public class InMemoryOrderRepository implements OrderRepository {
     public double getTotalAmountOfAllOrders(){
         return repo.values().stream().mapToDouble(Order::getTotalAmount).sum();
     }
+    @Override
+    public boolean removeOrder(String orderCode) {
+        if (repo.containsKey(orderCode)){
+            repo.remove(orderCode);
+            return true;
+        }
+        return false;
+    }
 
 
     @Override
