@@ -41,7 +41,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
 //        }
 //    }
     public DatabaseCustomerRepository() {
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -67,7 +67,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     @Override
     public Customer createCustomer(String customerName, String phoneNumber) {
         if(customerName == null || phoneNumber == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -92,7 +92,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     @Override
     public Customer findCustomer(String customerId) {
         if(customerId == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -123,7 +123,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     @Override
     public Customer updateCustomer(Customer customer) {
         if(customer == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -144,7 +144,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
 
     @Override
     public Collection<Customer> allCustomers() {
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }

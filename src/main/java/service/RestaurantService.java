@@ -10,11 +10,12 @@ import repository.memory.InMemoryOrderRepository;
 import java.util.Collection;
 
 public class RestaurantService {
-    private final InMemoryCustomerRepository customer;
-    private final InMemoryMenuRepository menu;
-    private final InMemoryOrderRepository order;
+    private final CustomerRepository customer;
+    private final MenuRepository menu;
+    private final OrderRepository order;
 
-    public RestaurantService(InMemoryCustomerRepository customer, InMemoryMenuRepository menu, InMemoryOrderRepository order) {
+
+    public RestaurantService(CustomerRepository customer, MenuRepository menu, OrderRepository order) {
         this.customer = customer;
         this.menu = menu;
         this.order = order;
@@ -98,10 +99,14 @@ public class RestaurantService {
         return order.updateOrder(o);
     }
     public Order cancleOrder(String orderCode){
-        Order o = order.findByCode(orderCode);
-        if (o == null) return null;
-        o.cancelOrder();
-        return order.updateOrder(o);
+        boolean removed = order.removeOrder(orderCode);
+        Order cancle = order.findByCode(orderCode);
+        if (removed) {
+            System.out.println("Order " + orderCode + " removed successfully.");
+        } else {
+            System.out.println("Order " + orderCode + " not found.");
+        }
+        return cancle;
     }
     public void listItem(String orderCode){
         Order o = order.findByCode(orderCode);

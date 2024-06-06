@@ -18,7 +18,7 @@ public class DatabaseMenuRepository implements MenuRepository {
 
     private static double nextMenuId = 0;
     public DatabaseMenuRepository(){
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -45,7 +45,7 @@ public class DatabaseMenuRepository implements MenuRepository {
     @Override
     public Menu createMenu(String menuName, double price) {
         if(menuName == null || price <0.0) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -69,7 +69,7 @@ public class DatabaseMenuRepository implements MenuRepository {
     @Override
     public Menu findMenu(String menuCode) {
         if(menuCode == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -100,7 +100,7 @@ public class DatabaseMenuRepository implements MenuRepository {
     @Override
     public Menu updateMenu(Menu menu) {
         if(menu == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -121,7 +121,7 @@ public class DatabaseMenuRepository implements MenuRepository {
 
     @Override
     public Collection<Menu> allMenu() {
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -148,7 +148,7 @@ public class DatabaseMenuRepository implements MenuRepository {
     @Override
     public boolean removeMenu(String menuCode) {
         if(menuCode == null) return false;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }

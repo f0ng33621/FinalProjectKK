@@ -18,7 +18,7 @@ public class DatabaseOrderRepository implements OrderRepository {
 
     private static double nextOrderCode = 0;
     public DatabaseOrderRepository(){
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class DatabaseOrderRepository implements OrderRepository {
     @Override
     public Order addOrder(Customer c) {
         if(c == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -69,7 +69,7 @@ public class DatabaseOrderRepository implements OrderRepository {
     @Override
     public Order updateOrder(Order order) {
         if(order == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -91,7 +91,7 @@ public class DatabaseOrderRepository implements OrderRepository {
     @Override
     public Order findByCode(String orderCode) {
         if(orderCode == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -147,7 +147,7 @@ public class DatabaseOrderRepository implements OrderRepository {
 
     @Override
     public Collection<Order> listAllCustomerOrder() {
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
+        try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
@@ -170,5 +170,39 @@ public class DatabaseOrderRepository implements OrderRepository {
             e.printStackTrace();
         }
         return orders;
+    }
+
+    @Override
+    public boolean removeOrder(String orderCode) {
+        if(orderCode == null) return false;
+        boolean isRemoved = false;
+
+        // Prepare the SQL statement
+        String deleteSQL = "DELETE FROM orders WHERE ordercode = ?";
+
+        try {
+            // Load the JDBC driver
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try (Connection connection = DriverManager.getConnection(url);
+             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
+
+            // Set the order code in the prepared statement
+            preparedStatement.setString(1, orderCode);
+
+            // Execute the delete statement
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            // If one or more rows were deleted, the order was removed
+            isRemoved = rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return isRemoved;
     }
 }
