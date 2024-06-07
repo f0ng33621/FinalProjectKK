@@ -69,7 +69,15 @@ public class FileMenuRepository implements MenuRepository,Serializable {
     @Override
     public Menu updateMenu(Menu menu) {
         if(menu == null) return null;
-        repo.replace(menu.getCode(),menu);
+        repo.replace(menu.getCode(), menu);
+        try (FileOutputStream fos = new FileOutputStream(filename);
+             BufferedOutputStream bos = new BufferedOutputStream(fos);
+             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(repo);
+            oos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return menu;
     }
 

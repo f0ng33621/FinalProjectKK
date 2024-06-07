@@ -66,6 +66,14 @@ public class FileOrderRepository implements OrderRepository,Serializable {
     public Order updateOrder(Order order) {
         if(order == null) return null;
         repo.replace(order.getOrderCode(),order);
+        try (FileOutputStream fos = new FileOutputStream(filename);
+             BufferedOutputStream bos = new BufferedOutputStream(fos);
+             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(repo);
+            oos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return order;
     }
 

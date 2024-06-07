@@ -1,6 +1,5 @@
 package repository.file;
 
-import com.sun.source.tree.Tree;
 import domain.Customer;
 import service.CustomerRepository;
 
@@ -69,6 +68,14 @@ public class FileCustomerRepository implements CustomerRepository,Serializable{
     public Customer updateCustomer(Customer customer) {
         if(customer == null) return null;
         repo.replace(customer.getId(),customer);
+        try (FileOutputStream fos = new FileOutputStream(filename);
+             BufferedOutputStream bos = new BufferedOutputStream(fos);
+             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(repo);
+            oos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return customer;
     }
 
