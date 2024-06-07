@@ -14,6 +14,8 @@ import domain.Customer;
 import domain.Order;
 import java.io.Console;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UiRestaurant {
 
@@ -62,6 +64,16 @@ public class UiRestaurant {
         }
 
         this.service = tempService;
+<<<<<<< HEAD
+    }
+
+    public static boolean isValidPhoneNumber(String phone) {
+        String regex = "^\\+?[0-9]{10,15}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(phone);
+        return matcher.matches();
+=======
+>>>>>>> main
     }
 
     public void start() {
@@ -104,8 +116,13 @@ public class UiRestaurant {
                     String name = scanner.nextLine();
                     System.out.print("Enter phone number: ");
                     String phone = scanner.nextLine();
-                    Customer customer = service.registerCustomer(name, phone);
-                    System.out.println("Registered Customer: " + customer);
+
+                    if (isValidPhoneNumber(phone)) {
+                        Customer customer = service.registerCustomer(name, phone);
+                        System.out.println("Registered Customer: " + customer);
+                    } else {
+                        System.out.println("Invalid phone number. Please enter a valid phone number.");
+                    }
                 }
                 case 2 -> {
                     System.out.print("Enter customer ID: ");
@@ -254,8 +271,12 @@ public class UiRestaurant {
                                 case 2 -> {
                                     System.out.print("Enter new phone number: ");
                                     String newPhone = scanner.nextLine();
-                                    Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
-                                    System.out.println("Updated Customer: " + updatedCustomer);
+                                    if (isValidPhoneNumber(newPhone)) {
+                                        Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
+                                        System.out.println("Updated Customer: " + updatedCustomer);
+                                    } else {
+                                        System.out.println("Invalid phone number. Please enter a valid phone number.");
+                                    }
                                 }
                                 case 3 -> {
                                     Collection<Menu> menus = service.allMenu();
