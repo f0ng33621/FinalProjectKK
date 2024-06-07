@@ -14,6 +14,8 @@ import domain.Customer;
 import domain.Order;
 import java.io.Console;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UiRestaurant {
 
@@ -62,6 +64,16 @@ public class UiRestaurant {
         }
 
         this.service = tempService;
+<<<<<<< HEAD
+    }
+
+    public static boolean isValidPhoneNumber(String phone) {
+        String regex = "^\\+?[0-9]{10,15}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(phone);
+        return matcher.matches();
+=======
+>>>>>>> main
     }
 
     public void start() {
@@ -104,28 +116,51 @@ public class UiRestaurant {
                     String name = scanner.nextLine();
                     System.out.print("Enter phone number: ");
                     String phone = scanner.nextLine();
-                    if (console == null) {
-                        // Handle no console case
-                        System.out.print("Console not available. Enter password: ");
-                        String regPassword = scanner.nextLine();
+
+                    if (isValidPhoneNumber(phone)) {
+                        Customer customer = service.registerCustomer(name, phone);
+                        System.out.println("Registered Customer: " + customer);
                     } else {
-                        char[] regPasswordArray = console.readPassword("Enter password: ");
-                        String regPassword = new String(regPasswordArray);
+                        System.out.println("Invalid phone number. Please enter a valid phone number.");
                     }
-                    Customer customer = service.registerCustomer(name, phone);
-                    System.out.println("Registered Customer: " + customer);
                 }
                 case 2 -> {
                     System.out.print("Enter customer ID: ");
                     String customerId = scanner.nextLine();
-
                     if (customerId.equals("C0")) {
-                        System.out.print("Enter admin password: ");
-                        String passwordAdmin = scanner.nextLine();
-                        if (!passwordAdmin.equals("admin")) {
-                            System.out.println("Incorrect password.");
+                        boolean isAuthenticated = false;
+                        int attempts = 3;
+                        String correctPassword = "admin";
+                        boolean authenticationAttempted = false; // Add this flag
+
+                        while (attempts > 0 && !isAuthenticated) {
+                            if (console == null) {
+                                // Handle no console case
+                                System.out.println("There is no console. Please run on Jar");
+                                authenticationAttempted = true; // Mark that authentication was attempted
+                                break;
+                            } else {
+                                char[] regPasswordArray = console.readPassword("Enter password: ");
+                                String regPassword = new String(regPasswordArray);
+                                if (!regPassword.equals(correctPassword)) {
+                                    System.out.println("Incorrect password. Please try again.");
+                                    attempts--;
+                                } else {
+                                    isAuthenticated = true;
+                                }
+                            }
+                        }
+
+                        if (!isAuthenticated && authenticationAttempted) {
+                            // Exit if authentication was attempted but failed due to no console
                             break;
                         }
+
+                        if (!isAuthenticated) {
+                            System.out.println("Too many failed attempts. Exiting.");
+                            break;
+                        }
+
                         boolean adminRunning = true;
                         String adminDescription = """
                                 1. Find Customer
@@ -236,8 +271,12 @@ public class UiRestaurant {
                                 case 2 -> {
                                     System.out.print("Enter new phone number: ");
                                     String newPhone = scanner.nextLine();
-                                    Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
-                                    System.out.println("Updated Customer: " + updatedCustomer);
+                                    if (isValidPhoneNumber(newPhone)) {
+                                        Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
+                                        System.out.println("Updated Customer: " + updatedCustomer);
+                                    } else {
+                                        System.out.println("Invalid phone number. Please enter a valid phone number.");
+                                    }
                                 }
                                 case 3 -> {
                                     Collection<Menu> menus = service.allMenu();
