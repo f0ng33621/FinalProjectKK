@@ -17,29 +17,6 @@ public class DatabaseCustomerRepository implements CustomerRepository {
 
     private static long nextCustomerId = 0;
 
-
-//    public static void main(String[] args) throws SQLException {
-//        Connection connection = null;
-//        try {
-//            // Load the MySQL JDBC driver
-//            Class.forName("com.mysql.cj.jdbc.Driver");
-//
-//            // Establish the connection
-//            connection = DriverManager.getConnection(url); //Test azure database
-//            System.out.println("Connected to the database!");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }finally {
-//            // Close the connection
-//            if (connection != null) {
-//                try {
-//                    connection.close();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
     public DatabaseCustomerRepository() {
         try{Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");}
         catch (ClassNotFoundException e){
