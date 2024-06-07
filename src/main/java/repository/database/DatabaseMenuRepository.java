@@ -79,7 +79,7 @@ public class DatabaseMenuRepository implements MenuRepository {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    String id = resultSet.getString("id");
+                    String id = resultSet.getString("code");
                     String name = resultSet.getString("name");
                     double price = resultSet.getDouble("price");
                     Menu fromDB = new Menu(id,name,price);

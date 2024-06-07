@@ -5,9 +5,7 @@ import domain.Order;
 import service.OrderRepository;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class DatabaseOrderRepository implements OrderRepository {
     private static final String hostName = "javadatabase.database.windows.net";

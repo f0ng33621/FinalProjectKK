@@ -96,23 +96,27 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     @Override
     public Customer updateCustomer(Customer customer) {
         if(customer == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
-        catch (ClassNotFoundException e){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         String id = customer.getId();
         String Name = customer.getName();
         String phoneNumber = customer.getPhoneNumber();
-        String updateSQL = "UPDATE customersdb SET name = ?, phone_number = ? WHERE id = ?";
-        try(Connection connection = DriverManager.getConnection(serverName,username,password);
-            PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)){
-            preparedStatement.setString(1,Name);
-            preparedStatement.setString(2,phoneNumber);
-            preparedStatement.setString(3,id);
-            return customer;
-        }catch (Exception e){
+        String updateSQL = "UPDATE customersdb SET name = ?, phonenumber = ? WHERE id = ?";
+        try (Connection connection = DriverManager.getConnection(serverName, username, password);
+             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+            preparedStatement.setString(1, Name);
+            preparedStatement.setString(2, phoneNumber);
+            preparedStatement.setString(3, id);
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("An existing customer was updated successfully!");
+                return customer;
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
-
         }
         return null;
     }

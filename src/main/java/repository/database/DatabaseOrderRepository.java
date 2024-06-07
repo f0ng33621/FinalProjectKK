@@ -84,7 +84,6 @@ public class DatabaseOrderRepository implements OrderRepository {
             return order;
         }catch (Exception e){
             e.printStackTrace();
-
         }
         return null;
     }
@@ -105,7 +104,9 @@ public class DatabaseOrderRepository implements OrderRepository {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String orderCodeDb = resultSet.getString("ocode");
-                    Customer customer = (Customer) resultSet.getObject("customer");
+                    String customerId = resultSet.getString("customerid");
+                    DatabaseCustomerRepository dcr = new DatabaseCustomerRepository();
+                    Customer customer = dcr.findCustomer(customerId);
                     Order fromDB = new Order(orderCodeDb,customer);
                     return fromDB;
                 } else {
@@ -217,7 +218,7 @@ public class DatabaseOrderRepository implements OrderRepository {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        String countSQL = "SELECT COUNT(*) AS count FROM customersdb";
+        String countSQL = "SELECT COUNT(*) AS count FROM ordersdb";
         try (Connection connection = DriverManager.getConnection(serverName, username, password);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(countSQL)) {

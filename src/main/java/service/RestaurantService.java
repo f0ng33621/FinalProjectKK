@@ -3,9 +3,6 @@ package service;
 import domain.Customer;
 import domain.Menu;
 import domain.Order;
-import repository.memory.InMemoryCustomerRepository;
-import repository.memory.InMemoryMenuRepository;
-import repository.memory.InMemoryOrderRepository;
 
 import java.util.Collection;
 

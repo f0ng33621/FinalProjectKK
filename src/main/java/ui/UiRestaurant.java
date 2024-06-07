@@ -235,7 +235,7 @@ public class UiRestaurant {
                                     System.out.println("Logged out.");
                                 }
                                 default ->
-                                    System.out.println("Invalid choice. Please try again.");
+                                        System.out.println("Invalid choice. Please try again.");
                             }
                         }
                     } else {
@@ -334,7 +334,7 @@ public class UiRestaurant {
                                                 orderRunning = false;
                                             }
                                             default ->
-                                                System.out.println("Invalid choice. Please try again.");
+                                                    System.out.println("Invalid choice. Please try again.");
                                         }
                                     }
                                 }
@@ -357,7 +357,7 @@ public class UiRestaurant {
                                     System.out.println("Logged out.");
                                 }
                                 default ->
-                                    System.out.println("Invalid choice. Please try again.");
+                                        System.out.println("Invalid choice. Please try again.");
                             }
                         }
                     }
@@ -381,7 +381,7 @@ public class UiRestaurant {
                     System.out.println("Exiting...");
                 }
                 default ->
-                    System.out.println("Invalid choice. Please try again.");
+                        System.out.println("Invalid choice. Please try again.");
             }
         }
         scanner.close();

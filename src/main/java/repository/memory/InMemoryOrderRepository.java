@@ -1,7 +1,6 @@
 package repository.memory;
 
 import domain.Customer;
-import domain.Menu;
 import domain.Order;
 import service.OrderRepository;
 
