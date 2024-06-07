@@ -81,9 +81,10 @@ public class DatabaseOrderRepository implements OrderRepository {
             preparedStatement.setString(1,customer.getId());
             preparedStatement.setDouble(2,totalAmount);
             preparedStatement.setString(3,orderCode);
+            return order;
         }catch (Exception e){
             e.printStackTrace();
-            return order;
+
         }
         return null;
     }

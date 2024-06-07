@@ -109,9 +109,10 @@ public class DatabaseCustomerRepository implements CustomerRepository {
             preparedStatement.setString(1,Name);
             preparedStatement.setString(2,phoneNumber);
             preparedStatement.setString(3,id);
+            return customer;
         }catch (Exception e){
             e.printStackTrace();
-            return customer;
+
         }
         return null;
     }
