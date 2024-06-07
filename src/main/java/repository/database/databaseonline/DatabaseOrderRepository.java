@@ -50,7 +50,7 @@ public class DatabaseOrderRepository implements OrderRepository {
         }
         String orderCode = "O" + ++nextOrderCode;
         Order order = new Order(orderCode,c);
-        String insertSQL = "INSERT INTO orders (ordercode, customerid, totalamount) VALUE (?, ?, ?)";
+        String insertSQL = "INSERT INTO orders (ordercode, customerid, totalamount) VALUES (?, ?, ?)";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
             preparedStatement.setString(1, orderCode);
@@ -202,5 +202,24 @@ public class DatabaseOrderRepository implements OrderRepository {
         }
 
         return isRemoved;
+    }
+    public int getOrderCount() {
+        int count = 0;
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String countSQL = "SELECT COUNT(*) AS count FROM orders";
+        try (Connection connection = DriverManager.getConnection(url);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(countSQL)) {
+            if (resultSet.next()) {
+                count = resultSet.getInt("count");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 }
