@@ -12,6 +12,6 @@ public interface OrderRepository {
     Order findByCode(String orderCode);
     Collection<Order> listAllOrderOwnedBy(String customerId);
     Collection<Order> listAllCustomerOrder();
-
+    public boolean removeOrder(String orderCode);
 
 }

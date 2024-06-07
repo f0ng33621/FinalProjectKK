@@ -39,8 +39,7 @@ public class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public boolean removeMenu(String menuCode) {
-        Menu menu = findMenu(menuCode);
-        if (menu != null){
+        if (repo.containsKey(menuCode)){
             repo.remove(menuCode);
             return true;
         }

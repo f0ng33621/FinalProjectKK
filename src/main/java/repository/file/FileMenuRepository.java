@@ -11,7 +11,7 @@ import java.util.*;
 public class FileMenuRepository implements MenuRepository {
 
     private static long nextMenuId = 0;
-    private final String filename = "src/main/java/repository/file/FileMenu.txt";
+    private final String filename = "src/main/java/repository/file/FileMenu.dat";
     private final Map<String,Menu> repo = new HashMap<>();
     public FileMenuRepository(){
         File check = new File(filename);

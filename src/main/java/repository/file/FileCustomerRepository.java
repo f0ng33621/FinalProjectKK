@@ -10,7 +10,7 @@ import java.util.*;
 
 public class FileCustomerRepository implements CustomerRepository {
     private long nextCustomerId;
-    private final String filename = "src/main/java/repository/file/FileCustomer.txt";
+    private final String filename = "src/main/java/repository/file/FileCustomer.dat";
     private Map<String, Customer> repo;
     public FileCustomerRepository(){
         File check = new File(filename);

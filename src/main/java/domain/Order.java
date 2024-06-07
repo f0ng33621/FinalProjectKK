@@ -79,12 +79,25 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" +
-                "orderId='" + orderCode + '\'' +
-                ", customer=" + customer +
-                ", items=" + items +
-                ", totalAmount=" + totalAmount +
-                '}';
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n++++++++++++++++++++++\n");
+        stringBuilder.append("Order{orderId : ").append(orderCode).append(", customerId : ").append(customer.getId()).append(", items : [");
+
+        boolean isFirst = true;
+        for (Map.Entry<Menu, Integer> entry : items.entrySet()) {
+            if (!isFirst) {
+                stringBuilder.append(", ");
+            } else {
+                isFirst = false;
+            }
+            Menu item = entry.getKey();
+            int quantity = entry.getValue();
+            stringBuilder.append("\n").append(item).append(", quantity: ").append(quantity);
+        }
+
+        stringBuilder.append("], totalAmount : ").append(totalAmount).append("}\n++++++++++++++++++++++");
+
+        return stringBuilder.toString();
     }
 
 
