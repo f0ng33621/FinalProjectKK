@@ -64,7 +64,7 @@ public class UiRestaurant {
         }
 
         this.service = tempService;
-<<<<<<< HEAD
+
     }
 
     public static boolean isValidPhoneNumber(String phone) {
@@ -72,8 +72,6 @@ public class UiRestaurant {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(phone);
         return matcher.matches();
-=======
->>>>>>> main
     }
 
     public void start() {
