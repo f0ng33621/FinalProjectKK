@@ -1,6 +1,10 @@
 package ui;
 
 import domain.Menu;
+import repository.database.*;
+import repository.file.FileCustomerRepository;
+import repository.file.FileMenuRepository;
+import repository.file.FileOrderRepository;
 import repository.memory.InMemoryCustomerRepository;
 import repository.memory.InMemoryMenuRepository;
 import repository.memory.InMemoryOrderRepository;
@@ -10,17 +14,63 @@ import domain.Customer;
 import domain.Order;
 import java.io.Console;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UiRestaurant {
 
     private final RestaurantService service;
 
-    public UiRestaurant(boolean useDatabase) {
-        if (!useDatabase) {
-            service = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
-        } else {
-            service = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
+    public UiRestaurant() {
+        Scanner chooseKeep = new Scanner(System.in);
+        boolean validChoice = false;
+        RestaurantService tempService = null;
+
+        while (!validChoice) {
+            System.out.println("""
+                    Your Select
+                    1 : InMemory
+                    2 : File
+                    3 : Database
+                    4 : DatabaseOnline
+                    """);
+            int choice = chooseKeep.nextInt();
+
+            switch (choice) {
+                case 1:
+                    tempService = new RestaurantService(new InMemoryCustomerRepository(), new InMemoryMenuRepository(), new InMemoryOrderRepository());
+                    validChoice = true;
+                    break;
+                case 2:
+                    tempService = new RestaurantService(new FileCustomerRepository(), new FileMenuRepository(), new FileOrderRepository());
+                    validChoice = true;
+                    break;
+                case 3:
+                    tempService = new RestaurantService(new DatabaseCustomerRepository(), new DatabaseMenuRepository(), new DatabaseOrderRepository());
+                    validChoice = true;
+                    break;
+                case 4:
+                    tempService = new RestaurantService(new repository.database.databaseonline.DatabaseCustomerRepository(), new repository.database.databaseonline.DatabaseMenuRepository(), new repository.database.databaseonline.DatabaseOrderRepository());
+                    validChoice = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please choose again.");
+                    break;
+            }
         }
+
+        if (tempService == null) {
+            throw new RuntimeException("Invalid choice. Service not initialized.");
+        }
+
+        this.service = tempService;
+    }
+
+    public static boolean isValidPhoneNumber(String phone) {
+        String regex = "^\\+?[0-9]{10,15}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(phone);
+        return matcher.matches();
     }
 
     public void start() {
@@ -63,8 +113,13 @@ public class UiRestaurant {
                     String name = scanner.nextLine();
                     System.out.print("Enter phone number: ");
                     String phone = scanner.nextLine();
-                    Customer customer = service.registerCustomer(name, phone);
-                    System.out.println("Registered Customer: " + customer);
+
+                    if (isValidPhoneNumber(phone)) {
+                        Customer customer = service.registerCustomer(name, phone);
+                        System.out.println("Registered Customer: " + customer);
+                    } else {
+                        System.out.println("Invalid phone number. Please enter a valid phone number.");
+                    }
                 }
                 case 2 -> {
                     System.out.print("Enter customer ID: ");
@@ -213,8 +268,12 @@ public class UiRestaurant {
                                 case 2 -> {
                                     System.out.print("Enter new phone number: ");
                                     String newPhone = scanner.nextLine();
-                                    Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
-                                    System.out.println("Updated Customer: " + updatedCustomer);
+                                    if (isValidPhoneNumber(newPhone)) {
+                                        Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
+                                        System.out.println("Updated Customer: " + updatedCustomer);
+                                    } else {
+                                        System.out.println("Invalid phone number. Please enter a valid phone number.");
+                                    }
                                 }
                                 case 3 -> {
                                     Collection<Menu> menus = service.allMenu();
@@ -235,7 +294,7 @@ public class UiRestaurant {
                                             3. List all menu you have ordered
                                             4. Submit
                                             5. Cancel
-                                            0. Exit Order Menu
+                                          
                                             """;
                                     while (orderRunning) {
                                         System.out.println(orderDescription);
@@ -273,8 +332,6 @@ public class UiRestaurant {
                                                 System.out.println("Order cancelled: " + order);
                                                 orderRunning = false;
                                             }
-                                            case 0 ->
-                                                orderRunning = false;
                                             default ->
                                                 System.out.println("Invalid choice. Please try again.");
                                         }
