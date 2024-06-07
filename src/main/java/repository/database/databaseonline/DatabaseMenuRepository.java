@@ -114,9 +114,9 @@ public class DatabaseMenuRepository implements MenuRepository {
             preparedStatement.setString(1,Name);
             preparedStatement.setFloat(2,price);
             preparedStatement.setString(3,code);
-            return new Menu(code,Name,price);
         }catch (Exception e){
             e.printStackTrace();
+            return menu;
         }
         return null;
     }

@@ -113,6 +113,7 @@ public class DatabaseMenuRepository implements MenuRepository {
             preparedStatement.setString(3,code);
         }catch (Exception e){
             e.printStackTrace();
+            return menu;
         }
         return null;
     }

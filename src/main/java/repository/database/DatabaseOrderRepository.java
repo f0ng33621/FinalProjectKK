@@ -83,6 +83,7 @@ public class DatabaseOrderRepository implements OrderRepository {
             preparedStatement.setString(3,orderCode);
         }catch (Exception e){
             e.printStackTrace();
+            return order;
         }
         return null;
     }

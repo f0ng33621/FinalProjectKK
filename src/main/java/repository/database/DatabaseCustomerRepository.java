@@ -111,6 +111,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
             preparedStatement.setString(3,id);
         }catch (Exception e){
             e.printStackTrace();
+            return customer;
         }
         return null;
     }
