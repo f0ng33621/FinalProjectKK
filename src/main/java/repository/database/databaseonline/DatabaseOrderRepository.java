@@ -29,9 +29,9 @@ public class DatabaseOrderRepository implements OrderRepository {
                 // Table does not exist
                 String createTableSQL = "CREATE TABLE orders (" +
                         "ordercode VARCHAR(20) PRIMARY KEY, " +
-                        "customer_id VARCHAR(255) NOT NULL, " +
-                        "FOREIGN KEY (customer_id) REFERENCE Customers(id)," +
-                        "total-amount DOUBLE NOT NULL";
+                        "customerid VARCHAR(255) NOT NULL, " +
+                        "FOREIGN KEY (customerid) REFERENCE Customers(id)," +
+                        "totalamount DOUBLE NOT NULL";
                 try (Statement statement = connection.createStatement()) {
                     statement.execute(createTableSQL);
                     System.out.println("Table 'orders' created.");
@@ -50,7 +50,7 @@ public class DatabaseOrderRepository implements OrderRepository {
         }
         String orderCode = "O" + ++nextOrderCode;
         Order order = new Order(orderCode,c);
-        String insertSQL = "INSERT INTO orders (ordercode, customer_id, total-amount) VALUE (?, ?, ?)";
+        String insertSQL = "INSERT INTO orders (ordercode, customerid, totalamount) VALUE (?, ?, ?)";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
             preparedStatement.setString(1, orderCode);
@@ -73,15 +73,13 @@ public class DatabaseOrderRepository implements OrderRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
-        String orderCode = order.getOrderCode();
-        Customer customer = order.getCustomer();
-        double totalAmount = order.getTotalAmount();
-        String updateSQL = "UPDATE orders SET customer_id = ?, total-amount = ? WHERE ordercode = ?";
+
+        String updateSQL = "UPDATE orders SET customerid = ?, totalamount = ? WHERE ordercode = ?";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)){
-            preparedStatement.setString(1,customer.getId());
-            preparedStatement.setDouble(2,totalAmount);
-            preparedStatement.setString(3,orderCode);
+            preparedStatement.setString(1,order.getCustomer().getId());
+            preparedStatement.setDouble(2,order.getTotalAmount());
+            preparedStatement.setString(3,order.getOrderCode());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -122,7 +120,7 @@ public class DatabaseOrderRepository implements OrderRepository {
     public Collection<Order> listAllOrderOwnedBy(String customerId) {
         if(customerId == null) return null;
         List<Order> orders = new ArrayList<>();
-        String selectSQL = "SELECT * FROM orders WHERE customer_id = ?";
+        String selectSQL = "SELECT * FROM orders WHERE customerid = ?";
 
         try (Connection connection = DriverManager.getConnection(url);
              PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
@@ -131,8 +129,8 @@ public class DatabaseOrderRepository implements OrderRepository {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String orderCode = resultSet.getString("ordercode");
-                    double totalAmount = resultSet.getDouble("total-amount");
-                    String customerId2 = resultSet.getString("customer_id");
+                    double totalAmount = resultSet.getDouble("totalamount");
+                    String customerId2 = resultSet.getString("customerid");
                     DatabaseCustomerRepository dcr = new DatabaseCustomerRepository();
                     Customer customer = dcr.findCustomer(customerId2);
                     Order order = new Order(orderCode, customer);
@@ -160,7 +158,7 @@ public class DatabaseOrderRepository implements OrderRepository {
 
             while (resultSet.next()) {
                 String orderCode = resultSet.getString("ordercode");
-                String customerId2 = resultSet.getString("customer_id");
+                String customerId2 = resultSet.getString("customerid");
                 DatabaseCustomerRepository dcr = new DatabaseCustomerRepository();
                 Customer customer = dcr.findCustomer(customerId2);
                 Order order = new Order(orderCode, customer);
