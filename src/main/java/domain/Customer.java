@@ -1,9 +1,11 @@
 package domain;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Customer {
+public class Customer implements Serializable {
     private final String id;
     private String name;
     private String phoneNumber;

@@ -8,32 +8,34 @@ import service.OrderRepository;
 import java.io.*;
 import java.util.*;
 
-public class FileOrderRepository implements OrderRepository {
+public class FileOrderRepository implements OrderRepository,Serializable {
     private static long nextOrderCode = 0;
-    private final Map<String, Order> repo = new HashMap<>();
+    private Map<String, Order> repo;
     private static final String filename = "src/main/java/repository/file/FileOrder.dat";
     public FileOrderRepository(){
         File check = new File(filename);
         if(check.exists()){
-            try{
-                FileInputStream fis = new FileInputStream(filename);
-                int content;
-                while((content = fis.read()) != -1) {
-                    System.out.println((char) content);
-                }
-            }catch (Exception e){
+            try (FileInputStream fis = new FileInputStream(filename);
+                 BufferedInputStream bis = new BufferedInputStream(fis);
+                 ObjectInputStream ois = new ObjectInputStream(bis)) {
+                repo = (Map<String, Order>) ois.readObject();
+                nextOrderCode = repo.values().stream()
+                        .mapToLong(o -> Long.parseLong(o.getOrderCode().substring(1)))
+                        .max()
+                        .orElse(0);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        else {
-            nextOrderCode = 1;
-            TreeMap<String, Customer> repo = new TreeMap<>();
-            try (FileOutputStream fileOut = new FileOutputStream(filename);
-                 ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-                out.writeObject(repo);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
+        } else {
+            nextOrderCode = 0;
+            repo = new TreeMap<>();
+            try (FileOutputStream fos = new FileOutputStream(filename);
+                 BufferedOutputStream bos = new BufferedOutputStream(fos);
+                 ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                oos.writeObject(repo);
+                oos.writeLong(nextOrderCode);
+                oos.flush();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -45,13 +47,17 @@ public class FileOrderRepository implements OrderRepository {
         String orderCode = "O" + ++nextOrderCode;
         Order order = new Order(orderCode,c);
         if (repo.putIfAbsent(orderCode, order) == null){
-            try(FileOutputStream fileOut = new FileOutputStream(filename); ObjectOutputStream out = new ObjectOutputStream(fileOut)){
+            try(FileOutputStream fileOut = new FileOutputStream(filename);
+                BufferedOutputStream bos = new BufferedOutputStream(fileOut);
+                ObjectOutputStream out = new ObjectOutputStream(bos)){
                 out.writeObject(order);
+                out.writeLong(nextOrderCode);
+                out.flush();
             }
             catch (IOException e){
                 e.printStackTrace();
             }
-        return order;
+            return order;
         }
         return null;
     }
@@ -59,126 +65,34 @@ public class FileOrderRepository implements OrderRepository {
     @Override
     public Order updateOrder(Order order) {
         if(order == null) return null;
-        List<Order> orders = new ArrayList<>();
-        try (FileInputStream fileIn = new FileInputStream(filename);
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
-            Order ord;
-            while ((ord = (Order) in.readObject()) != null) {
-                if (ord.getOrderCode().equals(order.getOrderCode())) {
-                    orders.add(order); // add the updated order
-                } else {
-                    orders.add(ord); // add the existing order
-                }
-            }
-        } catch (EOFException e) {
-            // This exception is expected when there are no more objects to read
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try (FileOutputStream fileOut = new FileOutputStream(filename);
-             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            for (Order ord : orders) {
-                out.writeObject(ord);
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        repo.replace(order.getOrderCode(),order);
         return order;
     }
 
     @Override
     public Order findByCode(String orderCode) {
         if(orderCode == null) return null;
-        try(FileInputStream filein = new FileInputStream(filename);
-            ObjectInputStream in = new ObjectInputStream(filein);){
-            Order ord;
-            while ((ord = (Order) in.readObject()) != null){
-                if(ord.getOrderCode().equals(orderCode)){
-                    return ord;
-                }
-            }
-        }catch (EOFException e){ // End of file Exception
-
-        } catch (IOException | ClassNotFoundException e){
-            e.printStackTrace();
-        }
-        return null;
+        return repo.get(orderCode);
     }
 
     @Override
     public Collection<Order> listAllOrderOwnedBy(String customerId) {
-        List<Order> orders = new ArrayList<>();
-        try (FileInputStream fileIn = new FileInputStream(filename);
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
-            Order ord;
-            while ((ord = (Order) in.readObject()) != null) {
-                if (ord.getCustomer().getId().equals(customerId)) {
-                    orders.add(ord);
-                }
-            }
-        } catch (EOFException e) {
-            // This exception is expected when there are no more objects to read
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return orders;
+        return repo.values()
+                .stream()
+                .filter(a -> a.getCustomer().getId().equals(customerId)).toList();
     }
 
     @Override
     public Collection<Order> listAllCustomerOrder() {
-        List<Order> orders = new ArrayList<>();
-        try (FileInputStream fileIn = new FileInputStream(filename);
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
-            Order ord;
-            while ((ord = (Order) in.readObject()) != null) {
-                    orders.add(ord);
-            }
-        } catch (EOFException e) {
-            // This exception is expected when there are no more objects to read
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return orders;
+        return repo.values();
     }
 
     @Override
     public boolean removeOrder(String orderCode) {
-        if(orderCode == null) return false;
-        List<Order> orders = new ArrayList<>();
-        boolean isRemoved = false;
-
-        // Read all orders from the file
-        try (FileInputStream fileIn = new FileInputStream(filename);
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
-            Order ord;
-            while ((ord = (Order) in.readObject()) != null) {
-                if (!ord.getOrderCode().equals(orderCode)) {
-                    orders.add(ord); // add the order if it's not the one to be removed
-                } else {
-                    isRemoved = true; // set the flag to true if the order is removed
-                }
-            }
-        } catch (EOFException e) {
-            // This exception is expected when there are no more objects to read
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        if (repo.containsKey(orderCode)){
+            repo.remove(orderCode);
+            return true;
         }
-
-        // Write the remaining orders back to the file
-        try (FileOutputStream fileOut = new FileOutputStream(filename);
-             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            for (Order ord : orders) {
-                out.writeObject(ord);
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return isRemoved;
+        return false;
     }
 }

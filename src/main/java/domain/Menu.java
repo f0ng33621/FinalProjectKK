@@ -1,6 +1,8 @@
 package domain;
 
-public class Menu {
+import java.io.Serializable;
+
+public class Menu implements Serializable {
     private final String code;
     private String name;
     private double price;

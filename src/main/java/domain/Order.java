@@ -1,9 +1,10 @@
 package domain;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;
 
 
-public class Order {
+public class Order implements Serializable {
     private final String orderCode;
     private final Customer customer;
     private final Map<Menu, Integer> items = new HashMap<>();
