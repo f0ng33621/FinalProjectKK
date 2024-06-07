@@ -294,7 +294,7 @@ public class UiRestaurant {
                                             3. List all menu you have ordered
                                             4. Submit
                                             5. Cancel
-                                          
+                                            0. Exit Order Menu
                                             """;
                                     while (orderRunning) {
                                         System.out.println(orderDescription);
@@ -332,6 +332,8 @@ public class UiRestaurant {
                                                 System.out.println("Order cancelled: " + order);
                                                 orderRunning = false;
                                             }
+                                            case 0 ->
+                                                orderRunning = false;
                                             default ->
                                                 System.out.println("Invalid choice. Please try again.");
                                         }
