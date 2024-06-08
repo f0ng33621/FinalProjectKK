@@ -54,10 +54,7 @@ public class Order implements Serializable {
         }
         return true;
     }
-    public void cancelOrder(){
-        items.clear();
-        totalAmount = 0.0;
-    }
+
     public void listAllItems() {
         if (items.isEmpty()) {
             System.out.println("No items in this order.");

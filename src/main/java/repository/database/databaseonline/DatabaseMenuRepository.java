@@ -114,9 +114,10 @@ public class DatabaseMenuRepository implements MenuRepository {
             preparedStatement.setString(1,Name);
             preparedStatement.setFloat(2,price);
             preparedStatement.setString(3,code);
-            return new Menu(code,Name,price);
+            return menu;
         }catch (Exception e){
             e.printStackTrace();
+
         }
         return null;
     }
@@ -154,10 +155,14 @@ public class DatabaseMenuRepository implements MenuRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
-        String deleteSQL = "DELETE FROM menus WHERE code = ?";
+        String name = "Not Available";
+        double price = 0;
+        String deleteSQL = "UPDATE menus SET name = ?, price = ? WHERE code = ?";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)){
-            preparedStatement.setString(1,menuCode);
+            preparedStatement.setString(1,name);
+            preparedStatement.setDouble(2,price);
+            preparedStatement.setString(3,menuCode);
             int rowDeleted = preparedStatement.executeUpdate();
             if(rowDeleted > 0 ){
                 return true;

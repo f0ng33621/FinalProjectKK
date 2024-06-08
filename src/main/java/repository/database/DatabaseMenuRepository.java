@@ -79,7 +79,7 @@ public class DatabaseMenuRepository implements MenuRepository {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    String id = resultSet.getString("id");
+                    String id = resultSet.getString("code");
                     String name = resultSet.getString("name");
                     double price = resultSet.getDouble("price");
                     Menu fromDB = new Menu(id,name,price);
@@ -111,8 +111,10 @@ public class DatabaseMenuRepository implements MenuRepository {
             preparedStatement.setString(1,Name);
             preparedStatement.setDouble(2,price);
             preparedStatement.setString(3,code);
+            return menu;
         }catch (Exception e){
             e.printStackTrace();
+
         }
         return null;
     }

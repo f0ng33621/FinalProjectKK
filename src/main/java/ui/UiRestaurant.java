@@ -235,7 +235,7 @@ public class UiRestaurant {
                                     System.out.println("Logged out.");
                                 }
                                 default ->
-                                    System.out.println("Invalid choice. Please try again.");
+                                        System.out.println("Invalid choice. Please try again.");
                             }
                         }
                     } else {
@@ -265,6 +265,7 @@ public class UiRestaurant {
                                     String newName = scanner.nextLine();
                                     Customer updatedCustomer = service.renameCustomer(customerId, newName);
                                     System.out.println("Updated Customer: " + updatedCustomer);
+                                    user = updatedCustomer;
                                 }
                                 case 2 -> {
                                     System.out.print("Enter new phone number: ");
@@ -272,6 +273,7 @@ public class UiRestaurant {
                                     if (isValidPhoneNumber(newPhone)) {
                                         Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
                                         System.out.println("Updated Customer: " + updatedCustomer);
+                                        user = updatedCustomer;
                                     } else {
                                         System.out.println("Invalid phone number. Please enter a valid phone number.");
                                     }
@@ -334,7 +336,7 @@ public class UiRestaurant {
                                                 orderRunning = false;
                                             }
                                             default ->
-                                                System.out.println("Invalid choice. Please try again.");
+                                                    System.out.println("Invalid choice. Please try again.");
                                         }
                                     }
                                 }
@@ -357,7 +359,7 @@ public class UiRestaurant {
                                     System.out.println("Logged out.");
                                 }
                                 default ->
-                                    System.out.println("Invalid choice. Please try again.");
+                                        System.out.println("Invalid choice. Please try again.");
                             }
                         }
                     }
@@ -381,7 +383,7 @@ public class UiRestaurant {
                     System.out.println("Exiting...");
                 }
                 default ->
-                    System.out.println("Invalid choice. Please try again.");
+                        System.out.println("Invalid choice. Please try again.");
             }
         }
         scanner.close();
