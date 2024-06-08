@@ -1,7 +1,9 @@
 package domain;
 
+import java.io.Serial;
 import java.io.Serializable;
 import domain.Exception.CheckException;
+import domain.Exception.UnCheckException;
 
 public class Menu implements Serializable {
     private final String code;
