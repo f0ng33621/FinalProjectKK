@@ -4,6 +4,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import domain.Exception.CheckException;
+import domain.Exception.UnCheckException;
 
 public class Customer implements Serializable {
     private final String id;
@@ -24,17 +26,17 @@ public class Customer implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
-        if (name.isBlank()) throw new IllegalArgumentException();
+    public void setName(String name) throws CheckException {
+        if (name.isBlank()) throw new CheckException("Name cannot be blank.");
         this.name = name;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
-    public void setPhoneNumber(String phoneNumber) {
-        //อาจแก้ split -
-        if (phoneNumber.isBlank()) throw new IllegalArgumentException();
+
+    public void setPhoneNumber(String phoneNumber) throws CheckException {
+        if (phoneNumber.isBlank()) throw new CheckException("Phone number cannot be blank.");
         this.phoneNumber = phoneNumber;
     }
 

@@ -1,6 +1,9 @@
 package domain;
 
+import java.io.Serial;
 import java.io.Serializable;
+import domain.Exception.CheckException;
+import domain.Exception.UnCheckException;
 
 public class Menu implements Serializable {
     private final String code;
@@ -21,8 +24,10 @@ public class Menu implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
-        if (name.isBlank()) throw new IllegalArgumentException();
+    public void setName(String name) throws CheckException {
+        if (name == null || name.isBlank()) {
+            throw new CheckException("Name cannot be null or blank.");
+        }
         this.name = name;
     }
 
@@ -30,11 +35,12 @@ public class Menu implements Serializable {
         return price;
     }
 
-    public void setPrice(double price) {
-        if (price < 0) throw new IllegalArgumentException();
+    public void setPrice(double price) throws CheckException {
+        if (price < 0) {
+            throw new CheckException("Price cannot be negative.");
+        }
         this.price = price;
     }
-
     @Override
     public String toString() {
         return "\nMenu{" + "Code : " + code + ", Name : " + name  + ", price : " + price + "}";
