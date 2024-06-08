@@ -1,6 +1,7 @@
 package service;
 
 import domain.Customer;
+import domain.Exception.CheckException;
 import domain.Menu;
 import domain.Order;
 import repository.memory.InMemoryCustomerRepository;
@@ -25,14 +26,14 @@ public class RestaurantService {
         if (customerName.isBlank()) return null;
         return customer.createCustomer(customerName,phoneNumber);
     }
-    public Customer renameCustomer(String customerId,String customerName){
+    public Customer renameCustomer(String customerId,String customerName) throws CheckException{
         if (customerName.isBlank() || customerId.isBlank())return null;
         Customer c = customer.findCustomer(customerId);
         if (c == null) return null;
         c.setName(customerName);
         return customer.updateCustomer(c);
     }
-    public Customer changePhoneNumberCustomer(String customerId,String phoneNumber){
+    public Customer changePhoneNumberCustomer(String customerId,String phoneNumber) throws CheckException{
         if (phoneNumber.isBlank() || customerId.isBlank())return null;
         Customer c = customer.findCustomer(customerId);
         if (c == null) return null;
@@ -51,14 +52,14 @@ public class RestaurantService {
         if (menuName.isBlank() || price < 0) return null;
         return menu.createMenu(menuName,price);
     }
-    public Menu renameMenu(String code,String name){
+    public Menu renameMenu(String code,String name) throws CheckException{
         if (code.isBlank() || name.isBlank())return null;
         Menu m = menu.findMenu(code);
         if (m == null) return null;
         m.setName(name);
         return menu.updateMenu(m);
     }
-    public Menu repriceMenu(String code,double price){
+    public Menu repriceMenu(String code,double price) throws CheckException{
         if (code.isBlank() || price < 0)return null;
         Menu m = menu.findMenu(code);
         if (m == null) return null;
