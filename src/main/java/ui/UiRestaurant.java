@@ -265,6 +265,7 @@ public class UiRestaurant {
                                     String newName = scanner.nextLine();
                                     Customer updatedCustomer = service.renameCustomer(customerId, newName);
                                     System.out.println("Updated Customer: " + updatedCustomer);
+                                    user = updatedCustomer;
                                 }
                                 case 2 -> {
                                     System.out.print("Enter new phone number: ");
@@ -272,6 +273,7 @@ public class UiRestaurant {
                                     if (isValidPhoneNumber(newPhone)) {
                                         Customer updatedCustomer = service.changePhoneNumberCustomer(customerId, newPhone);
                                         System.out.println("Updated Customer: " + updatedCustomer);
+                                        user = updatedCustomer;
                                     } else {
                                         System.out.println("Invalid phone number. Please enter a valid phone number.");
                                     }
