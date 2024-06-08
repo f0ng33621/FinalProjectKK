@@ -1,9 +1,10 @@
 package domain;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;
 
 
-public class Order {
+public class Order implements Serializable {
     private final String orderCode;
     private final Customer customer;
     private final Map<Menu, Integer> items = new HashMap<>();
@@ -53,10 +54,7 @@ public class Order {
         }
         return true;
     }
-    public void cancelOrder(){
-        items.clear();
-        totalAmount = 0.0;
-    }
+
     public void listAllItems() {
         if (items.isEmpty()) {
             System.out.println("No items in this order.");

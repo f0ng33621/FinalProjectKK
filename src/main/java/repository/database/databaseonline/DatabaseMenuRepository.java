@@ -30,7 +30,7 @@ public class DatabaseMenuRepository implements MenuRepository {
                 String createTableSQL = "CREATE TABLE menus (" +
                         "code VARCHAR(20) PRIMARY KEY, " +
                         "name VARCHAR(255) NOT NULL, " +
-                        "price Double NOT NULL)";
+                        "price FLOAT NOT NULL)";
                 try (Statement statement = connection.createStatement()) {
                     statement.execute(createTableSQL);
                     System.out.println("Table 'menus' created.");
@@ -49,13 +49,14 @@ public class DatabaseMenuRepository implements MenuRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
+        nextMenuId = getMenuCount();
         String menuId = "M" + ++nextMenuId;
-        String insertSQL = "INSERT INTO menus (code, name, price) VALUE (?, ?, ?)";
+        String insertSQL = "INSERT INTO menus (code, name, price) VALUES (?, ?, ?)";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
             preparedStatement.setString(1, menuId);
             preparedStatement.setString(2,menuName);
-            preparedStatement.setDouble(3,price);
+            preparedStatement.setFloat(3,(float) price);
             int rowInserted = preparedStatement.executeUpdate();
             if(rowInserted > 0 ){
                 return new Menu(menuId,menuName,price);
@@ -83,7 +84,7 @@ public class DatabaseMenuRepository implements MenuRepository {
                 if (resultSet.next()) {
                     String id = resultSet.getString("id");
                     String name = resultSet.getString("name");
-                    double price = resultSet.getDouble("price");
+                    float price = resultSet.getFloat("price");
                     Menu fromDB = new Menu(id,name,price);
                     return fromDB;
                 } else {
@@ -106,15 +107,17 @@ public class DatabaseMenuRepository implements MenuRepository {
         }
         String code = menu.getCode();
         String Name = menu.getName();
-        double price = menu.getPrice();
+        float price = (float) menu.getPrice();
         String updateSQL = "UPDATE menus SET name = ?, price = ? WHERE code = ?";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)){
             preparedStatement.setString(1,Name);
-            preparedStatement.setDouble(2,price);
+            preparedStatement.setFloat(2,price);
             preparedStatement.setString(3,code);
+            return menu;
         }catch (Exception e){
             e.printStackTrace();
+
         }
         return null;
     }
@@ -135,7 +138,7 @@ public class DatabaseMenuRepository implements MenuRepository {
             while (resultSet.next()) {
                 String id = resultSet.getString("code");
                 String name = resultSet.getString("name");
-                double price = resultSet.getDouble("price");
+                float price = resultSet.getFloat("price");
                 Menu menu = new Menu(id, name, price);
                 menuslist.add(menu);
             }
@@ -152,10 +155,14 @@ public class DatabaseMenuRepository implements MenuRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
-        String deleteSQL = "DELETE FROM menus WHERE code = ?";
+        String name = "Not Available";
+        double price = 0;
+        String deleteSQL = "UPDATE menus SET name = ?, price = ? WHERE code = ?";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)){
-            preparedStatement.setString(1,menuCode);
+            preparedStatement.setString(1,name);
+            preparedStatement.setDouble(2,price);
+            preparedStatement.setString(3,menuCode);
             int rowDeleted = preparedStatement.executeUpdate();
             if(rowDeleted > 0 ){
                 return true;
@@ -164,5 +171,24 @@ public class DatabaseMenuRepository implements MenuRepository {
             e.printStackTrace();
         }
         return false;
+    }
+    public int getMenuCount() {
+        int count = 0;
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String countSQL = "SELECT COUNT(*) AS count FROM menus";
+        try (Connection connection = DriverManager.getConnection(url);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(countSQL)) {
+            if (resultSet.next()) {
+                count = resultSet.getInt("count");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 }

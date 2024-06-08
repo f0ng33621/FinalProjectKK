@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class DatabaseMenuRepository implements MenuRepository {
-    private static String serverName = "jdbc:mysql://localhost:3306/java103";
-    private static String username = "root";
-    private static String password = "Fong_33621";
+    private static final String serverName = "jdbc:mysql://localhost:3306/java103";
+    private static final String username = "root";
+    private static final String password = "Fong_33621";
     private static double nextMenuId = 0;
     public DatabaseMenuRepository(){
         try{Class.forName("com.mysql.cj.jdbc.Driver");}
@@ -46,6 +46,7 @@ public class DatabaseMenuRepository implements MenuRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
+        nextMenuId = getMenuCount();
         String menuId = "M" + ++nextMenuId;
         String insertSQL = "INSERT INTO menus (code, name, price) VALUE (?, ?, ?)";
         try(Connection connection = DriverManager.getConnection(serverName,username,password);
@@ -78,7 +79,7 @@ public class DatabaseMenuRepository implements MenuRepository {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    String id = resultSet.getString("id");
+                    String id = resultSet.getString("code");
                     String name = resultSet.getString("name");
                     double price = resultSet.getDouble("price");
                     Menu fromDB = new Menu(id,name,price);
@@ -110,8 +111,10 @@ public class DatabaseMenuRepository implements MenuRepository {
             preparedStatement.setString(1,Name);
             preparedStatement.setDouble(2,price);
             preparedStatement.setString(3,code);
+            return menu;
         }catch (Exception e){
             e.printStackTrace();
+
         }
         return null;
     }
@@ -149,10 +152,14 @@ public class DatabaseMenuRepository implements MenuRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
-        String deleteSQL = "DELETE FROM menus WHERE code = ?";
+        String name = "Not Available";
+        double price = 0;
+        String deleteSQL = "UPDATE menus SET name = ?, price = ? WHERE code = ?";
         try(Connection connection = DriverManager.getConnection(serverName,username,password);
             PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)){
-            preparedStatement.setString(1,menuCode);
+            preparedStatement.setString(1,name);
+            preparedStatement.setDouble(2,price);
+            preparedStatement.setString(3,menuCode);
             int rowDeleted = preparedStatement.executeUpdate();
             if(rowDeleted > 0 ){
                 return true;
@@ -161,5 +168,24 @@ public class DatabaseMenuRepository implements MenuRepository {
             e.printStackTrace();
         }
         return false;
+    }
+    public int getMenuCount() {
+        int count = 0;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String countSQL = "SELECT COUNT(*) AS count FROM menus";
+        try (Connection connection = DriverManager.getConnection(serverName, username, password);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(countSQL)) {
+            if (resultSet.next()) {
+                count = resultSet.getInt("count");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 }

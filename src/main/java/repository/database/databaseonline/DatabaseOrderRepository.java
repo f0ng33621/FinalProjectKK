@@ -1,13 +1,14 @@
 package repository.database.databaseonline;
 
 import domain.Customer;
+import domain.Menu;
 import domain.Order;
 import service.OrderRepository;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DatabaseOrderRepository implements OrderRepository {
     private static final String hostName = "javadatabase.database.windows.net";
@@ -31,7 +32,7 @@ public class DatabaseOrderRepository implements OrderRepository {
                         "ordercode VARCHAR(20) PRIMARY KEY, " +
                         "customerid VARCHAR(255) NOT NULL, " +
                         "FOREIGN KEY (customerid) REFERENCE Customers(id)," +
-                        "totalamount DOUBLE NOT NULL";
+                        "totalamount DOUBLE NOT NULL, menuid VARCHAR(255) NOT NULL";
                 try (Statement statement = connection.createStatement()) {
                     statement.execute(createTableSQL);
                     System.out.println("Table 'orders' created.");
@@ -50,12 +51,13 @@ public class DatabaseOrderRepository implements OrderRepository {
         }
         String orderCode = "O" + ++nextOrderCode;
         Order order = new Order(orderCode,c);
-        String insertSQL = "INSERT INTO orders (ordercode, customerid, totalamount) VALUE (?, ?, ?)";
+        String insertSQL = "INSERT INTO orders (ordercode, customerid, totalamount, menuid) VALUE (?, ?, ?, ?)";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
             preparedStatement.setString(1, orderCode);
             preparedStatement.setString(2,c.getId());
             preparedStatement.setDouble(3,order.getTotalAmount());
+            preparedStatement.setString(4,order.getItems().toString());
             int rowInserted = preparedStatement.executeUpdate();
             if(rowInserted > 0 ){
                 return new Order(orderCode,c);
@@ -74,12 +76,17 @@ public class DatabaseOrderRepository implements OrderRepository {
             e.printStackTrace();
         }
 
-        String updateSQL = "UPDATE orders SET customerid = ?, totalamount = ? WHERE ordercode = ?";
+        String updateSQL = "UPDATE orders SET customerid = ?, totalamount = ?, menuid = ? WHERE ordercode = ?";
         try(Connection connection = DriverManager.getConnection(url);
             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)){
             preparedStatement.setString(1,order.getCustomer().getId());
             preparedStatement.setDouble(2,order.getTotalAmount());
-            preparedStatement.setString(3,order.getOrderCode());
+            preparedStatement.setString(3,order.getItems().toString());
+            preparedStatement.setString(4,order.getOrderCode());
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if(rowsUpdated > 0){
+                return order;
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -102,8 +109,22 @@ public class DatabaseOrderRepository implements OrderRepository {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String orderCodeDb = resultSet.getString("ordercode");
-                    Customer customer = (Customer) resultSet.getObject("customer");
+                    String customerId = resultSet.getString("customerid");
+                    repository.database.DatabaseCustomerRepository dcr = new repository.database.DatabaseCustomerRepository();
+                    Customer customer = dcr.findCustomer(customerId);
                     Order fromDB = new Order(orderCodeDb,customer);
+                    String menuid = resultSet.getString("menuid");
+                    String patternString = "Menu\\{Code : (.*?), Name : (.*?), price : ([\\d\\.]+)\\}=(\\d+)";
+                    Pattern pattern = Pattern.compile(patternString);
+                    Matcher matcher = pattern.matcher(menuid);
+                    if (matcher.find()) {
+                        String code = matcher.group(1);
+                        String name = matcher.group(2);
+                        double price = Double.parseDouble(matcher.group(3));
+                        int quantity = Integer.parseInt(matcher.group(4));
+                        Menu item = new Menu(code, name, price);
+                        fromDB.addItem(item, quantity);
+                    }
                     return fromDB;
                 } else {
                     System.out.println("orders not found.");
@@ -134,6 +155,18 @@ public class DatabaseOrderRepository implements OrderRepository {
                     DatabaseCustomerRepository dcr = new DatabaseCustomerRepository();
                     Customer customer = dcr.findCustomer(customerId2);
                     Order order = new Order(orderCode, customer);
+                    String menuid = resultSet.getString("menuid");
+                    String patternString = "Menu\\{Code : (.*?), Name : (.*?), price : ([\\d\\.]+)\\}=(\\d+)";
+                    Pattern pattern = Pattern.compile(patternString);
+                    Matcher matcher = pattern.matcher(menuid);
+                    if (matcher.find()) {
+                        String code = matcher.group(1);
+                        String name = matcher.group(2);
+                        double price = Double.parseDouble(matcher.group(3));
+                        int quantity = Integer.parseInt(matcher.group(4));
+                        Menu item = new Menu(code, name, price);
+                        order.addItem(item, quantity);
+                    }
                     orders.add(order);
                 }
             }
@@ -162,6 +195,18 @@ public class DatabaseOrderRepository implements OrderRepository {
                 DatabaseCustomerRepository dcr = new DatabaseCustomerRepository();
                 Customer customer = dcr.findCustomer(customerId2);
                 Order order = new Order(orderCode, customer);
+                String menuid = resultSet.getString("menuid");
+                String patternString = "Menu\\{Code : (.*?), Name : (.*?), price : ([\\d\\.]+)\\}=(\\d+)";
+                Pattern pattern = Pattern.compile(patternString);
+                Matcher matcher = pattern.matcher(menuid);
+                if (matcher.find()) {
+                    String code = matcher.group(1);
+                    String name = matcher.group(2);
+                    double price = Double.parseDouble(matcher.group(3));
+                    int quantity = Integer.parseInt(matcher.group(4));
+                    Menu item = new Menu(code, name, price);
+                    order.addItem(item, quantity);
+                }
                 orders.add(order);
             }
         } catch (SQLException e) {
@@ -176,8 +221,9 @@ public class DatabaseOrderRepository implements OrderRepository {
         boolean isRemoved = false;
 
         // Prepare the SQL statement
-        String deleteSQL = "DELETE FROM orders WHERE ordercode = ?";
-
+        String deleteSQL = "UPDATE orders SET customerid = ?, totalamount = ?, menuid = ? WHERE ordercode = ?";
+        String update = "Not Available";
+        double amount = 0.0;
         try {
             // Load the JDBC driver
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -189,7 +235,10 @@ public class DatabaseOrderRepository implements OrderRepository {
              PreparedStatement preparedStatement = connection.prepareStatement(deleteSQL)) {
 
             // Set the order code in the prepared statement
-            preparedStatement.setString(1, orderCode);
+            preparedStatement.setString(1, update);
+            preparedStatement.setDouble(2, amount);
+            preparedStatement.setString(3, update);
+            preparedStatement.setString(4, orderCode);
 
             // Execute the delete statement
             int rowsAffected = preparedStatement.executeUpdate();
@@ -202,5 +251,32 @@ public class DatabaseOrderRepository implements OrderRepository {
         }
 
         return isRemoved;
+    }
+    public int getOrderCount() {
+        int count = 0;
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String countSQL = "SELECT MAX(ordercode) FROM orders";
+        try (Connection connection = DriverManager.getConnection(url);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(countSQL)) {
+            if (resultSet.next()) {
+                String result = resultSet.getString(1);
+                if(result != null) {
+                    Pattern pattern = Pattern.compile("(\\d+\\.\\d+)$");
+                    Matcher matcher = pattern.matcher(result);
+                    if(matcher.find()){
+                        double extractedValue = Double.parseDouble(matcher.group(1));
+                        count = (int) extractedValue;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 }

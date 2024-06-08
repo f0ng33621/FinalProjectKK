@@ -12,35 +12,6 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     private static final String password = "Fong_33621";
     private static long nextCustomerId = 0;
 
-
-    public static void main(String[] args) throws SQLException { //Test Database
-//        String hostName = "javadatabase.database.windows.net";
-//        String dbName = "javaproject";
-//        String user = "Fong";
-//        String Password = "Darkkiller_204";
-//        String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, Password);
-        Connection connection = null;
-        try {
-            // Load the MySQL JDBC driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Establish the connection
-//            connection = DriverManager.getConnection(url); //For azure sql server
-            connection = DriverManager.getConnection(serverName, username, password);
-            System.out.println("Connected to the database!");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }finally {
-            // Close the connection
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
     public DatabaseCustomerRepository() {
         try{Class.forName("com.mysql.cj.jdbc.Driver");}
         catch (ClassNotFoundException e){
@@ -48,16 +19,16 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         }
         try (Connection connection = DriverManager.getConnection(serverName, username, password)) {
             DatabaseMetaData dbm = connection.getMetaData();
-            ResultSet tables = dbm.getTables(null, null, "customers", null);
+            ResultSet tables = dbm.getTables(null, null, "customersdb", null);
             if (!tables.next()) {
                 // Table does not exist
-                String createTableSQL = "CREATE TABLE customers (" +
+                String createTableSQL = "CREATE TABLE customersdb (" +
                         "id VARCHAR(20) PRIMARY KEY, " +
                         "name VARCHAR(255) NOT NULL, " +
                         "phonenumber VARCHAR(15) NOT NULL)";
                 try (Statement statement = connection.createStatement()) {
                     statement.execute(createTableSQL);
-                    System.out.println("Table 'customers' created.");
+                    System.out.println("Table 'customersdb' created.");
                 }
             }
         } catch (SQLException e) {
@@ -72,10 +43,11 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
+        nextCustomerId = getCustomerCount();
         String customerId = "C" + ++nextCustomerId;
-        String insertSQL = "INSERT INTO customers (id, name, phonenumber) VALUE (?, ?, ?)";
+        String insertSQL = "INSERT INTO customersdb (id, name, phonenumber) VALUE (?, ?, ?)";
         try(Connection connection = DriverManager.getConnection(serverName,username,password);
-        PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)){
             preparedStatement.setString(1,customerId);
             preparedStatement.setString(2,customerName);
             preparedStatement.setString(3,phoneNumber);
@@ -97,10 +69,10 @@ public class DatabaseCustomerRepository implements CustomerRepository {
         catch (ClassNotFoundException e){
             e.printStackTrace();
         }
-        String selectSQL = "SELECT * FROM customers WHERE id = ?";
+        String selectSQL = "SELECT * FROM customersdb WHERE id = ?";
 
         try (Connection connection = DriverManager.getConnection(serverName,username,password);
-                PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
             preparedStatement.setString(1, customerId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -124,20 +96,26 @@ public class DatabaseCustomerRepository implements CustomerRepository {
     @Override
     public Customer updateCustomer(Customer customer) {
         if(customer == null) return null;
-        try{Class.forName("com.mysql.cj.jdbc.Driver");}
-        catch (ClassNotFoundException e){
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         String id = customer.getId();
         String Name = customer.getName();
         String phoneNumber = customer.getPhoneNumber();
-        String updateSQL = "UPDATE customers SET name = ?, phone_number = ? WHERE id = ?";
-        try(Connection connection = DriverManager.getConnection(serverName,username,password);
-        PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)){
-            preparedStatement.setString(1,Name);
-            preparedStatement.setString(2,phoneNumber);
-            preparedStatement.setString(3,id);
-        }catch (Exception e){
+        String updateSQL = "UPDATE customersdb SET name = ?, phonenumber = ? WHERE id = ?";
+        try (Connection connection = DriverManager.getConnection(serverName, username, password);
+             PreparedStatement preparedStatement = connection.prepareStatement(updateSQL)) {
+            preparedStatement.setString(1, Name);
+            preparedStatement.setString(2, phoneNumber);
+            preparedStatement.setString(3, id);
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("An existing customer was updated successfully!");
+                return customer;
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
@@ -150,7 +128,7 @@ public class DatabaseCustomerRepository implements CustomerRepository {
             e.printStackTrace();
         }
         List<Customer> customers = new ArrayList<>();
-        String selectSQL = "SELECT * FROM customers";
+        String selectSQL = "SELECT * FROM customersdb";
 
         try (Connection connection = DriverManager.getConnection(serverName, username, password);
              Statement statement = connection.createStatement();
@@ -167,6 +145,25 @@ public class DatabaseCustomerRepository implements CustomerRepository {
             e.printStackTrace();
         }
         return customers;
+    }
+    public int getCustomerCount() {
+        int count = 0;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        String countSQL = "SELECT COUNT(*) AS count FROM customersdb";
+        try (Connection connection = DriverManager.getConnection(serverName, username, password);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(countSQL)) {
+            if (resultSet.next()) {
+                count = resultSet.getInt("count");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 }
 
